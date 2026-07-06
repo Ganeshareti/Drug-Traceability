@@ -1,0 +1,24 @@
+
+{% extends 'u_base.html' %}
+{% block content %}
+<center>
+	<font size="" color="#ff0000"><strong>{{msg}}</strong></font>
+	<br><br>
+<h2>View Orders </h2>
+<br><br>
+
+<table width="100%" id="tab" >
+<tr><th>Drug ID<th>Medicine Name<th>Items added<th>Cost<th>Total Cost
+{% for d1 in data %}
+
+
+<TR><TD>{{d1.did}}<TD>{{d1.mname}}<TD>{{d1.count}}<TD>{{d1.cost}}<TD>{{d1.totcost}}
+		
+{% endfor %}
+
+</table>
+
+<br><br>
+
+
+{% endblock %}

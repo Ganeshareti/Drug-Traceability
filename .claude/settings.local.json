@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./.venv/Scripts/pip list *)",
+      "Bash(./.venv/Scripts/pip install *)",
+      "Bash(timeout 10 /bin/true)",
+      "Bash(./.venv/Scripts/python *)",
+      "Bash(./.venv/Scripts/pip download *)",
+      "Bash(curl -s https://pypi.org/pypi/py-solc-x/json)",
+      "Bash(..venvScriptspython *)",
+      "Bash(python *)",
+      "Bash(ganache *)",
+      "Bash(.venv/Scripts/python webapp/BlockChain.py)",
+      "Bash(curl *)",
+      "Bash(.venv/Scripts/python manage.py migrate)",
+      "Bash(mysql *)",
+      "Bash(/c/Program Files/MySQL/MySQL Server 8.1/bin/mysql.exe *)",
+      "Bash(.venv/Scripts/python manage.py runserver 0.0.0.0:8000)",
+      "Bash(dir *)",
+      "Bash(.venvScriptsactivate *)",
+      "Bash(.venv/Scripts/python.exe *)",
+      "Bash(.venvScriptspython.exe *)",
+      "Bash(ganache-cli *)",
+      "Bash(killall python *)",
+      "Bash(python manage.py runserver --noreload)",
+      "Bash(curl -s http://127.0.0.1:8000/)",
+      "Bash(pkill -f \"manage.py runserver\")",
+      "Bash(python -c \"from webapp import views; print\\('Import successful'\\)\")",
+      "Bash(DJANGO_SETTINGS_MODULE=DrugTrace.settings python -c \"from webapp import views; print\\('Import successful'\\)\")",
+      "Bash(DJANGO_SETTINGS_MODULE=DrugTrace.settings python -c ' *)",
+      "Bash(PYTHONPATH='/f/MY_PROJECTS/Drug Traceability/DrugTrace' DJANGO_SETTINGS_MODULE=DrugTrace.settings python -c ' *)",
+      "Bash(python -c ' *)",
+      "Bash(cd *)",
+      "Bash(cp webapp/views.py webapp/views.py.tmp)",
+      "Bash(sed -i '14,15d' webapp/views.py.tmp)",
+      "Bash(timeout 10 python manage.py runserver --noreload 0.0.0.0:8000)",
+      "Bash(timeout 5 'PYTHONPATH=/f/MY_PROJECTS/Drug Traceability/DrugTrace' DJANGO_SETTINGS_MODULE=DrugTrace.settings python -c ' *)",
+      "Bash(PYTHONPATH='/f/MY_PROJECTS/Drug Traceability/DrugTrace' DJANGO_SETTINGS_MODULE=DrugTrade.settings timeout 5 python -c ' *)",
+      "Bash(PYTHONPATH='/f/MY_PROJECTS/Drug Traceability/DrugTrace' DJANGO_SETTINGS_MODULE=DrugTrace.settings timeout 5 python -c ' *)",
+      "Bash(sed -i '12s/import web3/from .BlockChain import web3/' webapp/views.py.tmp)"
+    ]
+  }
+}

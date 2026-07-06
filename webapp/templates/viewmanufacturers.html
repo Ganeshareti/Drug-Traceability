@@ -1,0 +1,42 @@
+
+{% extends 'a_base.html' %}
+{% block content %}
+<center>
+	<font size="" color="#ff0000"><strong>{{msg}}</strong></font>
+	<br><br>
+<h2>View new requests</h2>
+<br><br>
+
+<table width="100%" id="tab" >
+<tr><th>ID<th>Company Name<th>Email<th>City<th>Address<th>
+{% for d1 in data %}
+
+<TR><TD>{{d1.id}}<TD>{{d1.name}}<TD>{{d1.email}}<TD>{{d1.city}}<TD>{{d1.address}}
+<td><form method="get" action="/acceptor/">
+<input type="hidden" name="mid" value="{{d1.id}}">
+	<input type="radio" required name="dec" value="Accepted">&nbsp;Accept&nbsp;&nbsp;&nbsp;
+<input type="radio" required name="dec" value="Rejected">&nbsp;Reject&nbsp;&nbsp;
+<input type="submit" value="Update">
+</form>
+{% endfor %}
+
+</table>
+
+
+<br>
+<h2>View Manufacturers</h2>
+<br>
+
+<table width="100%" id="tab" >
+<tr><th>ID<th>Company Name<th>Email<th>City<th>Address
+{% for d1 in data2 %}
+
+<TR><TD>{{d1.id}}<TD>{{d1.name}}<TD>{{d1.email}}<TD>{{d1.city}}<TD>{{d1.address}}
+{% endfor %}
+
+</table>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,32 @@
+
+{% extends 'p_base.html' %}
+{% block content %}
+<center>
+	<font size="" color="#ff0000"><strong>{{msg}}</strong></font>
+	<br><br>
+<h2>View Cart </h2>
+<br><br>
+
+<table width="100%" id="tab" >
+<tr><th>Drug ID<th>Medicine Name<th>Total Cost<th>Items added
+{% for d1 in data %}
+
+
+<TR><TD>{{d1.did}}<TD>{{d1.mname}}<TD>{{d1.totcost}}<TD>{{d1.count}}
+		
+{% endfor %}
+
+</table>
+
+<br><br>
+<table>
+<tr>
+	<td><form method="post" action="/pviewcart/">
+	{% csrf_token %}
+	<input type="submit" class="form-control" value="Pay">
+</form></td>
+</tr>
+</table>
+
+
+{% endblock %}

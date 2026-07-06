@@ -1,0 +1,531 @@
+
+
+from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, request
+
+from .models import *
+
+import matplotlib.pyplot as plt;
+import numpy as np
+import numpy
+from .BlockChain import web3
+from django.shortcuts import render, redirect
+from .BlockChain import account_1, private_key
+
+from .BlockChain import compile_contract, deploy_contract
+compiled_sol = compile_contract()
+contract = deploy_contract(compiled_sol)
+    
+
+
+# Create your views here.
+def homepage(request):
+    
+    d=cart_u.objects.filter(stz='done')
+
+    for d1 in d:
+        # Build and sign transaction for contract interaction
+        nonce = web3.eth.get_transaction_count(account_1)
+        tx = contract.functions.addData(d1.email, str(d1.id)).build_transaction({
+            "chainId": 1337,  # Ganache default chain ID
+            "gas": 200000,
+            "gasPrice": web3.to_wei(50, "gwei"),
+            "nonce": nonce,
+        })
+        signed_tx = web3.eth.account.sign_transaction(tx, private_key)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        web3.eth.wait_for_transaction_receipt(tx_hash)
+
+
+    return render(request, 'index.html')
+
+# Create your views here.
+def adminlogin(request):
+    return render(request, 'admin.html')
+
+
+def adminloginaction(request):
+    userid=request.POST['aid']
+    pwd=request.POST['pwd']
+    print(userid, pwd,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    if userid=='admin' and pwd=="admin":
+        request.session['adminid']='admin'
+        return render(request, 'adminhome.html')
+    else:
+        err='Your Login Data is wrong !!' 
+        return render(request, 'admin.html',{'msg':err})
+
+
+
+
+def adminhome(request):
+    return render(request, 'adminhome.html')
+
+
+
+def viewmanufacturers(request):
+    d=manufacturers.objects.filter(stz__exact='new')
+    d2=manufacturers.objects.filter(stz__exact='Accepted')
+    return render(request, 'viewmanufacturers.html',{'data': d,'data2': d2})
+
+def acceptor(request):
+    mid=request.GET['mid']
+    dec=request.GET['dec']
+    
+    d=manufacturers.objects.filter(id=mid).update(stz=dec)
+    d=manufacturers.objects.filter(stz__exact='new')
+    d2=manufacturers.objects.filter(stz__exact='Accepted')
+    return render(request, 'viewmanufacturers.html',{'data': d,'data2': d2, 'msg':'Operation Done !!'})
+
+
+
+def adminlogout(request):
+    return render(request, 'admin.html')
+
+def user(request):
+    return render(request, 'user.html')
+
+
+def manufacturer(request):
+    return render(request, 'manufacturer.html')
+
+def pharmacy(request):
+    return render(request, 'pharmacies.html')
+
+
+def usignupaction(request):
+	if request.method=='POST':
+		email=request.POST['mail']
+
+		d=users.objects.filter(email__exact=email).count()
+		if d>0:
+			return render(request, 'user.html',{'msg':"Email Already Registered"})
+		else:
+			
+			pass_word=request.POST['pass_word']
+			phone=request.POST['phone']
+			city=request.POST['city']
+			name=request.POST['name']
+			gen=request.POST['gen']
+			
+			d=users(name=name,email=email,pass_word=pass_word,phone=phone,gender=gen,city=city)
+			d.save()
+
+			return render(request, 'user.html',{'msg':"Register Success, You can Login.."})
+	else:
+		return render(request, 'user.html')
+
+def userloginaction(request):
+    if request.method=='POST':
+        uid=request.POST['mail']
+        pass_word=request.POST['pass_word']
+        d=users.objects.filter(email__exact=uid).filter(pass_word__exact=pass_word).count()
+        
+        if d>0:
+            d=users.objects.filter(email__exact=uid)
+            request.session['email']=uid
+            request.session['name']=d[0].name
+         
+         
+            return render(request, 'userhome.html',{'data': d[0]})
+
+        else:
+            return render(request, 'user.html',{'msg':"Login Fail"})
+
+    else:
+        return render(request, 'user.html')
+    
+
+def userlogout(request):
+    try:
+        del request.session['email']
+    except:
+        pass
+    return render(request, 'user.html')
+
+
+def userhome(request):
+    if "email" in request.session:
+        email=request.session["email"]
+        d=users.objects.filter(email__exact=email)
+
+       
+        return render(request, 'userhome.html',{'data': d[0]})
+
+    else:
+        return redirect('userlogout')
+
+   
+def viewprofilepage(request):
+    if "email" in request.session:
+        uid=request.session["email"]
+        d=users.objects.filter(email__exact=uid)
+        return render(request, 'viewpprofile.html',{'data': d[0]})
+
+    else:
+        return render(request, 'user.html')
+
+
+
+def msignupaction(request):
+	if request.method=='POST':
+		email=request.POST['mail']
+
+		d=manufacturers.objects.filter(email__exact=email).count()
+		if d>0:
+			return render(request, 'manufacturer.html',{'msg':"Email Already Registered"})
+		else:
+			
+			pass_word=request.POST['pass_word']
+			city=request.POST['city']
+			name=request.POST['name']
+			address=request.POST['add']
+			
+			d=manufacturers(name=name,email=email,pass_word=pass_word,address=address,city=city, stz='new')
+			d.save()
+
+			return render(request, 'manufacturer.html',{'msg':"Register Success, You can Login.."})
+	else:
+		return render(request, 'manufacturer.html')
+
+
+def mloginaction(request):
+    if request.method=='POST':
+        uid=request.POST['mail']
+        pass_word=request.POST['pass_word']
+        d=manufacturers.objects.filter(email__exact=uid).filter(pass_word__exact=pass_word).filter(stz__exact='Accepted').count()
+        d2=manufacturers.objects.filter(email__exact=uid).filter(pass_word__exact=pass_word).filter(stz__exact='new').count()
+        
+        if d>0:
+            d=manufacturers.objects.filter(email__exact=uid)
+            request.session['memail']=uid
+            request.session['mname']=d[0].name
+         
+         
+            return render(request, 'm_home.html',{'data': d[0]})
+
+        elif d2>0:
+            return render(request, 'manufacturer.html',{'msg':"Admin not accepted !!"})
+        
+        else:
+            return render(request, 'manufacturer.html',{'msg':"Login Fail !!"})
+
+    else:
+        return render(request, 'manufacturer.html')
+   
+
+
+
+def adddrug(request):
+    if request.method=='POST':
+        dname=request.POST['dname']
+        mname=request.POST['mname']
+        cost=request.POST['cost']
+        uses=request.POST['uses']
+        typ_e=request.POST['typ_e']
+        mrp=request.POST['mrp']
+        instructions=request.POST['instructions']
+
+        email=request.session['memail']
+        name=request.session['mname']
+        import random as r
+        did=r.randint(99999,999999)
+
+        d=drug(did=did,drugname=dname, mname=mname, typ_e=typ_e, uses=uses, instructions=instructions, cost=cost, mrp=mrp, cname=name, cemail=email, stock=0)
+        d.save()
+
+        
+
+        return render(request, 'adddrug.html', {'msg':'Drug Added successfully !!'})
+    else:
+        return render(request, 'adddrug.html')
+   
+
+def viewdrug(request):
+    if "memail" in request.session:
+        memail=request.session["memail"]
+        d=drug.objects.filter(cemail__exact=memail)
+           
+        return render(request, 'viewdrug.html',{'data':d})
+
+    else:
+        return redirect('mlogout')
+
+def addstock(request):
+    did=request.GET['did']
+    memail=request.session["memail"]
+    stock=int(request.GET['stock'])
+    from django.db.models import F
+    
+    drug.objects.filter(did = did).update(stock=F('stock')+stock)
+    d=drug.objects.filter(cemail__exact=memail)
+    
+    return render(request, 'viewdrug.html',{'data':d, 'msg':'Stock Updated'})
+
+def viewstock(request):
+    did=int(float(request.GET['did']))
+    memail=request.session["memail"]
+    d2=drug.objects.filter(did__exact=did)
+    d2=d2[0].stock
+    d=drug.objects.filter(cemail__exact=memail)
+    
+    return render(request, 'viewdrug.html',{'data':d, 'stock':d2, 'b':True})
+
+
+
+
+   
+def mlogout(request):
+    try:
+        del request.session['memail']
+    except:
+        pass
+    return render(request, 'manufacturer.html')
+
+
+def mhome(request):
+    if "memail" in request.session:
+        memail=request.session["memail"]
+        d=manufacturers.objects.filter(email__exact=memail)
+
+       
+        return render(request, 'm_home.html',{'data': d[0]})
+
+    else:
+        return redirect('mlogout')
+
+#------------------------------------------------
+def psignupaction(request):
+    if request.method=='POST':
+        email =request.POST['mail'] 
+        d=pharmacies.objects.filter(email__exact=email).count()
+        if d>0:
+            return render(request, 'pharmacies.html',{'msg':"Email Already Registered"})
+        else:
+
+            pass_word=request. POST['pass_word']
+            city=request.POST['city']
+            name=request.POST['name']
+            phone=request.POST['phone']
+            address=request.POST['add']
+        
+            d=pharmacies(name=name,email=email,pass_word=pass_word,address=address,city=city , phone=phone)
+            d.save()
+
+        return render(request, 'pharmacies.html',{'msg':"Register  Success, You can Login.."})
+    else:
+        return render(request, 'pharmacies.html')
+
+def ploginaction(request):
+    if request.method=='POST':
+        uid=request.POST['mail']
+        pass_word=request.POST['pass_word']
+        d=pharmacies.objects.filter(email__exact=uid).filter(pass_word__exact=pass_word).count()
+        
+        
+        if d>0:
+            d=pharmacies.objects.filter(email__exact=uid)
+            request.session['pemail']=uid
+            request.session['pname']=d[0].name
+         
+         
+            return render(request, 'p_home.html',{'data': d[0]})
+
+        else:
+            return render(request, 'pharmacies.html',{'msg':"Login Fail !!"})
+
+    else:
+        return render(request, 'pharmacies.html')
+   
+
+   
+def plogout(request):
+    try:
+        del request.session['pemail']
+    except:
+        pass
+    return render(request, 'pharmacies.html')
+
+
+def p_home(request):
+    if "pemail" in request.session:
+        memail=request.session["pemail"]
+        d=pharmacies.objects.filter(email__exact=memail)
+        return render(request, 'p_home.html',{'data': d[0]})
+
+    else:
+        return redirect('plogout')
+
+
+
+def pviewdrugs(request):
+    if "pemail" in request.session:
+        
+        d=drug.objects.filter(stock__gt=0)
+                  
+        return render(request, 'pviewdrug.html',{'data':d})
+
+    else:
+        return redirect('mlogout')
+
+
+def addtocart_p(request):
+    if "pemail" in request.session:
+        pemail=request.session['pemail']
+        pname=request.session['pname']
+        did=request.GET['did']
+        cnt=int(request.GET['count'])
+        d=drug.objects.filter(did=did)
+        d=d[0]
+        cost=d.cost
+        totcost=cost*cnt
+        
+        c1=drugstock_p.objects.filter(did=did).count()
+        if c1>0:
+            s1=cart_p(did=did, mname=d.drugname, totcost=totcost, count=cnt, pemail=pemail)
+            s1.save()
+            
+        else:
+            s1=drugstock_p(did=did, drugname=d.drugname, mname=d.mname, typ_e=d.typ_e, uses=d.uses, instructions=d.instructions, cost=d.cost, mrp=d.mrp, pname=pname, pemail=pemail, stock=0)
+            s1.save()
+            s1=cart_p(did=did, mname=d.mname, totcost=totcost, count=cnt, pemail=pemail)
+            s1.save()
+            
+        
+        d=drug.objects.filter(stock__gt=0)
+
+        return render(request, 'pviewdrug.html',{'data':d, 'msg':'Added to cart !!'})
+
+    else:
+        return redirect('plogout')
+
+
+def pviewcart(request):
+    pemail=request.session['pemail']
+    if request.method=='POST':
+        
+        from django.db.models import F
+        
+        c1=cart_p.objects.filter(pemail=pemail)
+        sum=0
+        for c11 in c1:
+            drugstock_p.objects.filter(did = c11.did).update(stock=F('stock')+c11.count)
+            sum=sum+c11.totcost
+        
+        return render(request, 'pay2.html',{'amt':sum, })
+
+    else:
+        c1=cart_p.objects.filter(pemail=pemail)
+        return render(request, 'viewcart_p.html',{'data':c1, })
+
+
+
+def payment_p(request):
+    pemail=request.session['pemail']
+    if request.method=='POST':
+        
+        d=cart_p.objects.filter(pemail=pemail)
+        d.delete()
+        return render(request, 'p_home.html',{'msg':'Stocks Updated !!', })
+
+    else:
+        pass
+
+
+
+
+def pviewstocks(request):
+    pemail=request.session['pemail']
+    if request.method=='GET':
+        d=drugstock_p.objects.filter(pemail=pemail)
+        
+        return render(request, 'pviewstocks.html',{'data':d, })
+
+    else:
+        pass
+
+
+
+def u_viewdrug(request):
+    if "email" in request.session:
+        
+        d=drugstock_p.objects.filter(stock__gt=0)
+        return render(request, 'uviewdrug.html',{'data':d})
+
+    else:
+        return redirect('mlogout')
+
+
+
+def addtocart_u(request):
+    if "email" in request.session:
+        email=request.session['email']
+        name=request.session['name']
+        
+        did=request.GET['did']
+        cnt=int(request.GET['count'])
+        
+        d=drugstock_p.objects.filter(did=did)
+        d=d[0]
+        cost=d.cost
+        totcost=cost*cnt
+        
+        
+        s1=cart_u(did=did, mname=d.mname, drugname=d.drugname,cost=d.cost, totcost=totcost, count=cnt, pemail=d.pemail, pharmacy=d.pname, email=email, stz='cart')
+        s1.save()
+            
+        d=drugstock_p.objects.filter(stock__gt=0)
+
+        return render(request, 'uviewdrug.html',{'data':d, 'msg':'Added to cart !!'})
+
+    else:
+        return redirect('ulogout')
+
+
+def uviewcart(request):
+    email=request.session['email']
+    if request.method=='POST':
+        
+        from django.db.models import F
+        
+        c1=cart_u.objects.filter(email=email)
+        sum=0
+       
+        for c11 in c1:
+            #drugstock_p.objects.filter(did = c11.did).update(stock=F('stock')+c11.count)
+            sum=sum+c11.totcost
+        cart_u.objects.filter(stz='cart').filter(email=email).update(stz='done')
+        
+        return render(request, 'pay.html',{'amt':sum, })
+
+    else:
+        c1=cart_u.objects.filter(email=email)
+        return render(request, 'viewcart_u.html',{'data':c1, })
+
+
+
+def payment_u(request):
+    email=request.session['email']
+    if request.method=='POST':
+        
+        return render(request, 'userhome.html',{'msg':'Thank you for your purchase Updated !!', })
+
+    else:
+        pass
+
+def view_u(request):
+    if "email" in request.session:
+        email=request.session['email']
+        name=request.session['name']
+        
+        data = contract.functions.getData(email).call()
+        print(data,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+
+        d=cart_u.objects.filter(id__in=data)
+
+        return render(request, 'u_view.html',{'data':d,})
+
+    else:
+        return redirect('ulogout')
+

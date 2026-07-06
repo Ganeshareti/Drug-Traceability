@@ -1,0 +1,49 @@
+
+{% extends 'm_base.html' %}
+{% block content %}
+<center>
+	<font size="" color="#ff0000"><strong>{{msg}}</strong></font>
+	<br><br>
+<h2>View Drugs</h2>
+<br><br>
+
+<table width="100%" id="tab" >
+<tr><th>ID<th>Drug Name<th>Medicine Name<th>Type<th>Cost<th>MRP<th>
+{% for d1 in data %}
+
+
+<TR><TD>{{d1.did}}<TD>{{d1.drugname}}<TD>{{d1.mname}}<TD>{{d1.typ_e}}<TD>{{d1.cost}} Rs/-<TD>{{d1.mrp}} Rs/-
+<td>
+
+{% if b %}
+
+	Stock: {{stock}}	
+<hr>
+	<h4>Add Stock</h6>
+<form method="get" action="/addstock/">
+	<input type="hidden" name="did" value="{{d1.did}}">
+<input type="number" required name="stock" ><br>
+
+		<input type="submit" value="Add Stock">
+	</form>
+
+
+		
+	{% else %}
+	
+	<form method="get" action="/viewstock/">
+	<input type="hidden" name="did" value="{{d1.did}}">
+		<input type="submit" value="View Stock">
+	</form>
+
+	 {% endif %}
+
+{% endfor %}
+
+</table>
+
+
+
+
+
+{% endblock %}

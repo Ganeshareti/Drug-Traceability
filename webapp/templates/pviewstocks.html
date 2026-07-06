@@ -1,0 +1,25 @@
+
+{% extends 'p_base.html' %}
+{% block content %}
+<center>
+	<font size="" color="#ff0000"><strong>{{msg}}</strong></font>
+	<br><br>
+<h2>View Stocks</h2>
+<br><br>
+
+<table width="100%" id="tab" >
+<tr><th>ID<th>Drug Name<th>Medicine Name<th>Type<th>Cost<th>MRP<th>Stocks
+{% for d1 in data %}
+
+
+<TR><TD>{{d1.did}}<TD>{{d1.drugname}}<TD>{{d1.mname}}<TD>{{d1.typ_e}}<TD>{{d1.cost}} Rs/-<TD>{{d1.mrp}} Rs/-<td>{{d1.stock}}
+		
+{% endfor %}
+
+</table>
+
+
+
+
+
+{% endblock %}
